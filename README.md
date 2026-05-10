@@ -70,14 +70,11 @@ broker/swim-broker/bin/artemis run
 
 ### 5. Run All Tests
 
+See [Automated Test Script](#automated-test-script) below for full details. Quick version:
+
 ```bash
 bash run-tests.sh           # All scenarios (broker must be running)
 bash run-tests.sh --no-amqp # REST scenarios only
-```
-
-From PowerShell or CMD:
-```
-& "C:\Program Files\Git\bin\bash.exe" run-tests.sh
 ```
 
 ## Project Structure
@@ -215,10 +212,63 @@ cd java && mvn exec:java -Dexec.mainClass="com.swim.smime.AmqpProducer" \
   -Dexec.args="../certs ../payload/sample-flight.json localhost 5672 swim.flight.data sign-encrypt"
 ```
 
-### Self-Test (C#)
+### Self-Tests
+
+Each language module has a self-test that validates sign, verify, encrypt, decrypt, and sign+encrypt+decrypt+verify in isolation (no server or broker needed):
 
 ```bash
+# Java
+cd java && mvn -q exec:java -Dexec.mainClass="com.swim.smime.SelfTest" -Dexec.args="../certs"
+
+# Python
+cd python && python self_test.py ../certs
+
+# C#
 cd csharp && dotnet run -- test ../certs
+```
+
+### Automated Test Script
+
+The `run-tests.sh` script automates the full test suite: builds all modules, runs the three self-tests, and executes all four cross-language scenarios. It starts and stops consumers automatically.
+
+```bash
+bash run-tests.sh           # Full suite (requires Artemis broker running)
+bash run-tests.sh --no-amqp # REST scenarios only (no broker needed)
+```
+
+From PowerShell or CMD:
+```
+& "C:\Program Files\Git\bin\bash.exe" run-tests.sh
+```
+
+The script requires `java`, `mvn`, `python`, and `dotnet` on PATH. You can override the Python executable by setting `PYTHON` before running:
+
+```bash
+PYTHON=/path/to/python3 bash run-tests.sh
+```
+
+Expected output (all 9 checks):
+
+```
+── Phase 1: Build ──────────────────────────────────────────────────────────
+  [PASS] Java compile
+  [PASS] C# compile
+  [PASS] Python dependencies
+
+── Phase 2: Self-Tests ───────────────────────────────────────────────────
+  [PASS] Python S/MIME self-test
+  [PASS] C# S/MIME self-test
+
+── Phase 3: REST Scenarios (WS Light with Message Security) ─────────────
+  [PASS] Scenario 1: Java->Python REST sign
+  [PASS] Scenario 2: Python->C# REST sign+encrypt
+
+── Phase 4: AMQP Scenarios (AMQP with Message Security) ─────────────────
+  [PASS] Scenario 3: C#->Java AMQP sign
+  [PASS] Scenario 4: Java->Python AMQP sign+encrypt
+
+  Results: 9/9 passed, 0 failed
+  ALL TESTS PASSED
 ```
 
 ## Code Walkthrough

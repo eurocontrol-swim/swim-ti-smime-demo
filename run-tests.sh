@@ -88,7 +88,7 @@ fi
 
 echo "  Building C# module..."
 cd "$SCRIPT_DIR/csharp"
-if dotnet build -q 2>&1 | grep -q "0 Error"; then
+if dotnet build -q > /dev/null 2>&1; then
     pass "C# compile"
 else
     fail "C# compile"
@@ -111,25 +111,17 @@ echo ""
 # ── 2. SELF-TESTS ──
 echo "── Phase 2: Self-Tests ───────────────────────────────────────────────────"
 
+echo "  Running Java self-test..."
+cd "$SCRIPT_DIR/java"
+if mvn -q exec:java -Dexec.mainClass="com.swim.smime.SelfTest" -Dexec.args="../certs" 2>&1 | grep -q "ALL JAVA S/MIME TESTS PASSED"; then
+    pass "Java S/MIME self-test"
+else
+    fail "Java S/MIME self-test"
+fi
+
 echo "  Running Python self-test..."
-cd "$SCRIPT_DIR"
-if "$PYTHON" -c "
-import sys; sys.path.insert(0, 'python')
-from smime_helper import *
-certs = 'certs'
-pkey = load_private_key(f'{certs}/producer.pfx', 'changeit')
-pcert = load_certificate(f'{certs}/producer.pfx', 'changeit')
-ckey = load_private_key(f'{certs}/consumer.pfx', 'changeit')
-ccert = load_certificate(f'{certs}/consumer.pfx', 'changeit')
-ccert_pub = load_certificate(f'{certs}/consumer.crt')
-payload = b'{\"test\": \"hello\"}'
-s, ct = sign(payload, 'application/json', pkey, pcert)
-v = verify_signature(s, ct, pcert); assert v == payload
-e, ct2 = encrypt(payload, 'application/json', ccert_pub)
-d = decrypt(e, ct2, ckey, ccert); assert d == payload
-se, ct3 = sign_and_encrypt(payload, 'application/json', pkey, pcert, ccert_pub)
-dv = decrypt_and_verify(se, ct3, ckey, ccert, pcert); assert dv == payload
-" 2>/dev/null; then
+cd "$SCRIPT_DIR/python"
+if "$PYTHON" self_test.py ../certs 2>&1 | grep -q "ALL PYTHON S/MIME TESTS PASSED"; then
     pass "Python S/MIME self-test"
 else
     fail "Python S/MIME self-test"
