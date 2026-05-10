@@ -1,0 +1,18 @@
+{
+  "flightIdentification": {
+    "aircraftIdentification": "BAW256",
+    "gufi": "urn:uuid:a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+  },
+  "departure": {
+    "aerodrome": "EGLL",
+    "estimatedOffBlockTime": "2026-05-09T14:30:00Z"
+  },
+  "arrival": {
+    "aerodrome": "KJFK",
+    "estimatedArrivalTime": "2026-05-09T22:15:00Z"
+  },
+  "flightRouteInformation": {
+    "cruisingLevel": "FL370",
+    "cruisingSpeed": "M082"
+  }
+}

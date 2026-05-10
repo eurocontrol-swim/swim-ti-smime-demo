@@ -1,0 +1,38 @@
+# Java
+java/target/
+
+# C#
+csharp/bin/
+csharp/obj/
+
+# Python
+__pycache__/
+*.pyc
+
+# Generated certificates (keep the generation script, not the output)
+certs/*.crt
+certs/*.key
+certs/*.pem
+certs/*.pfx
+certs/*.srl
+certs/*.csr
+certs/*.cnf
+
+# Broker instance (generated locally)
+broker/swim-broker/
+
+# Test artifacts
+.test-markers/
+
+# IDE
+.idea/
+.vscode/
+*.suo
+*.user
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation (kept separately)
+docs/
