@@ -1,6 +1,6 @@
 # SWIM S/MIME 4.0 Demo
 
-Working example of S/MIME 4.0 (RFC 8551) message security for the [EUROCONTROL SWIM TI Yellow Profile](https://www.eurocontrol.int/) specification (SWIM-TIYP-0112), demonstrating cross-language interoperability across **Java**, **Python**, and **C#** for both **REST** and **AMQP 1.0** transports.
+Working example of S/MIME 4.0 (RFC 8551) message security for the [EUROCONTROL SWIM TI Yellow Profile]([https://www.eurocontrol.int/](https://www.eurocontrol.int/publication/eurocontrol-spec-170-eurocontrol-specification-swim-technical-infrastructure-ti-yellow)) specification (SWIM-TIYP-0112), demonstrating cross-language interoperability across **Java**, **Python**, and **C#** for both **REST** and **AMQP 1.0** transports.
 
 ## What This Demonstrates
 
@@ -22,7 +22,7 @@ The payload is a FIXM-inspired JSON flight data message.
 
 ## Prerequisites
 
-| Software | Version | Install |
+| Software | Version | Install (examples for Windows 11)|
 |---|---|---|
 | Java JDK | 17 LTS (Eclipse Temurin) | `winget install EclipseAdoptium.Temurin.17.JDK` |
 | Python | 3.12 | `winget install Python.Python.3.12` |
