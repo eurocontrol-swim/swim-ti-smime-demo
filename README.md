@@ -18,7 +18,29 @@ This project shows how to implement both bindings with producers and consumers w
 | 3 | AMQP Sign | C# (AMQPNetLite) | Java (Qpid ProtonJ2) | AMQP 1.0 | Integrity |
 | 4 | AMQP Sign+Encrypt | Java (Qpid ProtonJ2) | Python (qpid-proton) | AMQP 1.0 | Integrity + Confidentiality |
 
+### Sample Payload (FIXM-Inspired)
 The payload is a FIXM-inspired JSON flight data message.
+
+```json
+{
+  "flightIdentification": {
+    "aircraftIdentification": "BAW256",
+    "gufi": "urn:uuid:a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+  },
+  "departure": {
+    "aerodrome": "EGLL",
+    "estimatedOffBlockTime": "2026-05-09T14:30:00Z"
+  },
+  "arrival": {
+    "aerodrome": "KJFK",
+    "estimatedArrivalTime": "2026-05-09T22:15:00Z"
+  },
+  "flightRouteInformation": {
+    "cruisingLevel": "FL370",
+    "cruisingSpeed": "M082"
+  }
+}
+```
 
 ## Prerequisites
 
@@ -134,6 +156,26 @@ This project uses **opaque signatures** (`application/pkcs7-mime; smime-type=sig
 **Sign + Encrypt**: `payload -> CMS_Sign -> CMS_Encrypt -> base64 -> transport`
 
 **Decrypt + Verify**: `base64 -> CMS_Decrypt -> CMS_Verify -> payload`
+
+The overall flow can be depicted as in the following schema:
+```
+                    SIGN                         ENCRYPT
+  +-----------+   (Integrity)  +------------+  (Confidentiality)  +-----------+
+  |  Original |  ============> | CMS        |  ==================>| CMS       |
+  |  JSON     |   Producer's   | SignedData |    Consumer's       | Enveloped |
+  |  Payload  |   Private Key  | (DER)      |    Public Cert      | Data(DER) |
+  +-----------+                +------------+                     +-----------+
+                                                                       |
+                                    HTTP POST / AMQP Message           |
+                               (Content-Type: application/pkcs7-mime)  |
+                                                                       v
+                    VERIFY                       DECRYPT
+  +-----------+   (Integrity)  +------------+  (Confidentiality)  +-----------+
+  |  Original |  <============ | CMS        |  <================= | CMS       |
+  |  JSON     |   Producer's   | SignedData |    Consumer's       | Enveloped |
+  |  Payload  |   Public Cert  | (DER)      |    Private Key      | Data(DER) |
+  +-----------+                +------------+                     +-----------+
+```
 
 ### SWIM-TIYP-0112 Headers
 
