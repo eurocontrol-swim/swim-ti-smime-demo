@@ -88,16 +88,14 @@ fi
 
 echo "  Building C# module..."
 cd "$SCRIPT_DIR/csharp"
-if dotnet build -q > /dev/null 2>&1; then
+dotnet build --nologo 2>&1 | tail -5
+if [ ${PIPESTATUS[0]} -eq 0 ]; then
     pass "C# compile"
 else
     fail "C# compile"
 fi
-# Resolve DLL path from build output (avoids executing .exe which may be blocked by security policies)
-CSHARP_DLL=$(dotnet build --nologo --no-restore -q "$SCRIPT_DIR/csharp" 2>&1 | grep -oP '(?<=> ).*\.dll$' | head -1)
-if [ -z "$CSHARP_DLL" ]; then
-    CSHARP_DLL="$SCRIPT_DIR/csharp/bin/Debug/net9.0/SwimSmimeDemo.dll"
-fi
+# Run via DLL to avoid security policies that may block locally-built .exe files
+CSHARP_DLL="$SCRIPT_DIR/csharp/bin/Debug/net9.0/SwimSmimeDemo.dll"
 
 echo "  Checking Python dependencies..."
 cd "$SCRIPT_DIR"
