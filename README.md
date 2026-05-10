@@ -247,7 +247,7 @@ The script requires `java`, `mvn`, `python`, and `dotnet` on PATH. You can overr
 PYTHON=/path/to/python3 bash run-tests.sh
 ```
 
-Expected output (all 9 checks):
+Expected output (all 10 checks):
 
 ```
 ── Phase 1: Build ──────────────────────────────────────────────────────────
@@ -256,6 +256,7 @@ Expected output (all 9 checks):
   [PASS] Python dependencies
 
 ── Phase 2: Self-Tests ───────────────────────────────────────────────────
+  [PASS] Java S/MIME self-test
   [PASS] Python S/MIME self-test
   [PASS] C# S/MIME self-test
 
@@ -267,7 +268,7 @@ Expected output (all 9 checks):
   [PASS] Scenario 3: C#->Java AMQP sign
   [PASS] Scenario 4: Java->Python AMQP sign+encrypt
 
-  Results: 9/9 passed, 0 failed
+  Results: 10/10 passed, 0 failed
   ALL TESTS PASSED
 ```
 
