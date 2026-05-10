@@ -93,6 +93,11 @@ if dotnet build -q > /dev/null 2>&1; then
 else
     fail "C# compile"
 fi
+# Resolve DLL path from build output (avoids executing .exe which may be blocked by security policies)
+CSHARP_DLL=$(dotnet build --nologo --no-restore -q "$SCRIPT_DIR/csharp" 2>&1 | grep -oP '(?<=> ).*\.dll$' | head -1)
+if [ -z "$CSHARP_DLL" ]; then
+    CSHARP_DLL="$SCRIPT_DIR/csharp/bin/Debug/net9.0/SwimSmimeDemo.dll"
+fi
 
 echo "  Checking Python dependencies..."
 cd "$SCRIPT_DIR"
@@ -129,7 +134,7 @@ fi
 
 echo "  Running C# self-test..."
 cd "$SCRIPT_DIR/csharp"
-if dotnet run -- test ../certs 2>&1 | grep -q "ALL C# S/MIME TESTS PASSED"; then
+if dotnet "$CSHARP_DLL" test ../certs 2>&1 | grep -q "ALL C# S/MIME TESTS PASSED"; then
     pass "C# S/MIME self-test"
 else
     fail "C# S/MIME self-test"
@@ -163,7 +168,7 @@ sleep 1
 # Scenario 2: Python Producer -> C# Consumer (sign+encrypt)
 echo "  Scenario 2: Python -> C# (REST, sign+encrypt)"
 cd "$SCRIPT_DIR/csharp"
-dotnet run -- rest-consumer ../certs 8443 > /tmp/swim_rest_csharpconsumer.log 2>&1 &
+dotnet "$CSHARP_DLL" rest-consumer ../certs 8443 > /tmp/swim_rest_csharpconsumer.log 2>&1 &
 PID=$!; PIDS_TO_KILL+=($PID)
 sleep 5
 
@@ -206,7 +211,7 @@ else
         sleep 5
 
         cd "$SCRIPT_DIR/csharp"
-        dotnet run -- amqp-producer ../certs ../payload/sample-flight.json \
+        dotnet "$CSHARP_DLL" amqp-producer ../certs ../payload/sample-flight.json \
             amqp://admin:admin@localhost:5672 swim.flight.data sign > /dev/null 2>&1
 
         # Poll log file for result (up to 15 seconds)
